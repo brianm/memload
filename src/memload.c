@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <assert.h>
+
 #include "buffer.h"
 
 
@@ -79,6 +81,7 @@ int main(int argc, char *argv[]) {
                         + buffer_size(servers)
                         + buffer_size(hash)
                         + 1);
+  assert(config);
   strcat(strcat(strcpy(config, buffer_get_str(hash)),
                 buffer_get_str(servers)), 
          "--NOREPLY --BUFFER-REQUESTS");
@@ -86,6 +89,7 @@ int main(int argc, char *argv[]) {
   if (verbose) {printf("libmemcached config = '%s'\n", config);}
 
   memcached_st* m = memcached(config, strlen(config));
+  assert(m);
 
   char line[buf_size];
   char *parsed;

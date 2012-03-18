@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "buffer.h"
 
@@ -13,6 +14,7 @@ struct buffer_t {
 
 buffer* buffer_new(int capacity) {
   buffer *buf = (buffer*) malloc(sizeof(buffer));
+  assert(buf);
   buf->data = (char*) malloc(capacity + 1);
   buf->data[capacity] = 0;
   buf->size = 0;
@@ -37,6 +39,7 @@ void buffer_set_data(buffer *buf, void *new_data, int new_data_sz) {
   }
   else {
     realloc(buf->data, new_data_sz + 1);
+    assert(buf);
     buf->capacity = new_data_sz;
     buf->size = new_data_sz;
     buf->data[new_data_sz] = 0;
