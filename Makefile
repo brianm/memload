@@ -4,7 +4,7 @@ PREFIX=/usr/local
 BINARY=memload
 
 build:
-	$(CC) -o $(BINARY) -lmemcached -L$(LIBMEMCACHED_ROOT)/lib -I$(LIBMEMCACHED_ROOT)/include src/*.c
+	$(CC) -o $(BINARY) -lmemcached -L$(LIBMEMCACHED_ROOT)/lib -I$(LIBMEMCACHED_ROOT)/include memload.c
 
 install: build
 	cp $(BINARY) $(PREFIX)/bin
