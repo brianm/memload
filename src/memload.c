@@ -133,6 +133,12 @@ int main(int argc, char *argv[]) {
       return usage();
     }
   }
+
+  if (!strcmp(init_config, config)) {
+    // no config was specified
+    return usage();
+  }
+
   argc -= optind;
   argv += optind;
 
