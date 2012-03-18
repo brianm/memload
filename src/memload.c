@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
                 buffer_get_str(servers)), 
          "--NOREPLY --BUFFER-REQUESTS");
 
-  if (verbose) {printf("[%s]\n", config);}
+  if (verbose) {printf("libmemcached config = '%s'\n", config);}
 
   memcached_st* m = memcached(config, strlen(config));
 
@@ -100,6 +100,12 @@ int main(int argc, char *argv[]) {
                          value, strlen(value),
                          (time_t)0,
                          (uint32_t)0);
+    if (verbose) {
+      memcached_server_instance_st srv = memcached_server_by_key(m, key, strlen(key), &rs);
+      const char *srv_name = memcached_server_name(srv);
+      int srv_port = memcached_server_port(srv);
+      printf("'%s' => '%s' at %s:%d\n", key, value, srv_name, srv_port);
+    }
     if (!memcached_success(rs)) {  
       printf("error '%s' trying to insert %s => %s\n", 
              memcached_strerror(m, rs),key, value);
