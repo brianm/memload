@@ -1,0 +1,1 @@
+Utility for bulk loading memcached. Reads key and value
