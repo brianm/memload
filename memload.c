@@ -62,15 +62,7 @@ static int process_file(FILE *in,
     }
 
     if (--(*max_count) == 0) { 
-      rs = memcached_flush_buffers(m);
-      if (!memcached_success(rs)) {  
-        puts(memcached_strerror(m, rs)); 
-        return 1;
-      }
-
-      memcached_quit(m);
-      memcached_free(m);
-      return 0; 
+      return 2; 
     }
   }
   return 0;
@@ -86,6 +78,7 @@ int main(int argc, char *argv[]) {
   // command line flags
   int buf_size = sysconf(_SC_PAGESIZE);
   int verbose = 0;
+  int very_verbose = 0;
   int max_count = -1;
   char *delimiter = "\t";
   char *init_config = "--NOREPLY --BUFFER-REQUESTS";
@@ -93,7 +86,7 @@ int main(int argc, char *argv[]) {
   memcpy(config, init_config, strlen(init_config));
 
   int len;
-  while ((ch = getopt(argc, argv, "S:H:s:d:vc:?h")) != -1) {
+  while ((ch = getopt(argc, argv, "S:H:s:d:Vvc:?h")) != -1) {
     switch (ch) {
     case 's':
       len = strlen(config);
@@ -115,6 +108,9 @@ int main(int argc, char *argv[]) {
       memcpy(config + len + 1 + 7, optarg, strlen(optarg)); // append optarg
       config[len + 1 + 7 + strlen(optarg)] = '\0'; // null terminate
       break;
+    case 'V':
+      very_verbose = 1;
+      // fallthrough
     case 'v':
       verbose = 1;
       break;
@@ -142,7 +138,7 @@ int main(int argc, char *argv[]) {
   argc -= optind;
   argv += optind;
 
-  if (verbose) {printf("libmemcached config = '%s'\n", config);}
+  if (very_verbose) {printf("libmemcached config = '%s'\n", config);}
 
   memcached_st* m = memcached(config, strlen(config));
   assert(m);
@@ -155,8 +151,8 @@ int main(int argc, char *argv[]) {
     while (argc > 0) {
       FILE *in;
       in = fopen(argv[0], "r");
-      if (process_file(in, buf_size, m, delimiter, verbose, &max_count)) {
-        die("exited early");
+      if(!process_file(in, buf_size, m, delimiter, verbose, &max_count)) {
+        goto ESCAPE;
       }
       fclose(in);
       argc--;
@@ -164,11 +160,12 @@ int main(int argc, char *argv[]) {
     }
   }
   else {
-    if (process_file(stdin, buf_size, m, delimiter, verbose, &max_count)) {
-      die("exited early");
+    if (!process_file(stdin, buf_size, m, delimiter, verbose, &max_count)) {
+      goto ESCAPE;
     }
   }
 
+  ESCAPE:
   rs = memcached_flush_buffers(m);
   if (!memcached_success(rs)) {  
     puts(memcached_strerror(m, rs)); 
