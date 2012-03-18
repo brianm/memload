@@ -19,6 +19,7 @@ static int usage() {
   puts("  -c <count>      : exit after loading count entries, useful for testing");
   puts("  -H <hash>       : hash algorithm to use instead of libmemcached's default");
   puts("  -v              : verbose output");
+  puts("  -V              : very verbose output");
   puts("  -h, -?          : show this help output");
   puts("  <input>         : file to take input from, otherwise will take from stdin");
   puts("                    multiple files will be processed in order if specified");
